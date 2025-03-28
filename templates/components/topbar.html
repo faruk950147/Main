@@ -121,7 +121,7 @@
 								</div>
 								<strong class="text-uppercase">My Cart:</strong>
 								<br>
-								<span class="text-uppercase cart-total-price">$ {{qty_total_price}}</span>
+								<span class="text-uppercase cart-total-price">$ {% if qty_total_price %} {{qty_total_price}} {% else %} 0.00 {% endif %}</span>
 							</a>
 							<div class="custom-menu">
 								<div id="shopping-cart">
