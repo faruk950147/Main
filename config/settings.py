@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'stories.apps.StoriesConfig',
     'cart.apps.CartConfig',
-    'checkout.apps.CheckoutConfig',
+    #'checkout.apps.CheckoutConfig',
 ]
 
 MIDDLEWARE = [
@@ -99,7 +99,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'E-Shop2',
+        'NAME': 'E-Shop1',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
