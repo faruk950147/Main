@@ -71,6 +71,11 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['id']
+        verbose_name_plural = '03. Carts Items'
+        
 
     def total_price(self):
         """Calculate total price of the item based on variant or product price."""

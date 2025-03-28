@@ -2,12 +2,12 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 import threading
-from cart.models import Cart
+from cart.models import CartItem
 
 # Custom User model import
 User = get_user_model()
 
-class CartForm(forms.ModelForm):
+class CartItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Form field styling
@@ -22,5 +22,5 @@ class CartForm(forms.ModelForm):
         return quantity
 
     class Meta:
-        model = Cart
+        model = CartItem
         fields = ('quantity',)
