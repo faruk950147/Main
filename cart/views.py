@@ -20,7 +20,7 @@ from stories.models import (
 from cart.models import (
     Coupon, Cart, CartItem
 )
-
+@method_decorator(never_cache, name='dispatch')
 class AddToCart(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('sign') 
 
@@ -29,9 +29,17 @@ class AddToCart(LoginRequiredMixin, generic.View):
             try:
                 # Parse JSON data from request
                 data = json.loads(request.body)  
-  
+                size_id = data.get("size_id")
+                color_id = data.get("color_id")
+                product_id = data.get("product_id")
+                quantity = data.get("quantity")
+                
 
-            
+                product = get_object_or_404 (Product, id=product_id)
+                variant = get_object_or_404(Variants, size_id=size_id, color_id=color_id)
+
+                return JsonResponse({"status": 200, "messages": "Product added to cart successfully"})  
+                
             except (ValueError, TypeError, json.JSONDecodeError) as e:
                 # Handle invalid input errors
                 return JsonResponse({"status": 400, "messages": f"Invalid input: {str(e)}"})
