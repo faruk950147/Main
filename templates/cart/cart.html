@@ -143,17 +143,9 @@
 				dataType: "json",
 				success: function (res) {
 					if (res.status == 200) {
-						// Update quantity and total price
 						$("span.quantity[data-id='" + res.id + "']").text(res.quantity);
-						$("strong.primary-color[data-id='" + res.id + "']").text("$ " + res.qty_total_price);
-						$(".cart-total-price").text("$ " + res.cart_total);
-						$(".sub-total").text("$ " + res.sub_total);
-						$(".finale-price").text("$ " + res.finale_price);
+						console.log('res', res)
 
-						// Update mini cart
-						$('.ajax-mini-cart-list').load(location.href + ' .ajax-mini-cart-list');
-						// Update cart list
-						$('.ajax-cart-list').load(location.href + ' .ajax-cart-list')
 						alertify.success(res.messages)	
 					}
 					else if (res.status == 400) {
@@ -198,9 +190,9 @@
 						$(".cart-count").text(res.cart_count);
 
 						// Update mini cart
-						$('.ajax-mini-cart-list').load(location.href + ' .ajax-mini-cart-list');
+						//$('.ajax-mini-cart-list').load(location.href + ' .ajax-mini-cart-list');
 						// Update cart list
-						$('.ajax-cart-list').load(location.href + ' .ajax-cart-list');
+						//$('.ajax-cart-list').load(location.href + ' .ajax-cart-list');
 						alertify.success(res.messages);
 
 					}

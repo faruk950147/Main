@@ -134,36 +134,36 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
     def post(self, request):
         if request.method == "POST":
             try:
-                # Request থেকে JSON ডাটা নিন
+                # Request to JSON data
                 data = json.loads(request.body)
                 cart_item_id = data.get("id")
                 action = data.get("action")
 
-                # cart_item_id বা action যদি না থাকে
+                # If cart_item_id or action is not present
                 if not cart_item_id or not action:
                     return JsonResponse({"status": 400, "messages": "Cart item ID and action are required!"})
 
-                # কার্ট আইটেমটি পাওয়া
+                # Get the cart item
                 cart_item = get_object_or_404(CartItem, id=cart_item_id)
 
-                # স্টক চেক করা
+                # Check the stock
                 product = cart_item.product
                 variant = cart_item.variant
                 
-                # Variant থাকলে variant এর স্টক বাড়ানো
+                # If variant exists, increase the variant stock
                 if variant:
                     max_stock = variant.quantity
-                else:  # Variant না থাকলে, product এর stock_max বাড়ানো
+                else:  # If variant does not exist, increase the product stock_max
                     max_stock = product.in_stock_max
 
-                # action অনুযায়ী পরিমাণ বাড়ানো বা কমানো
+                # Increase or decrease the quantity based on the action
                 if action == "increase":
                     if variant and cart_item.quantity < max_stock:
                         cart_item.quantity += 1
                         cart_item.save()
                         message = "Variant quantity increased successfully!"
                     elif not variant and cart_item.quantity < max_stock:
-                        product.in_stock_max += 1  # Product এর stock_max বাড়ানো
+                        product.in_stock_max += 1  # Increase the product stock_max
                         product.save()
                         message = "Product stock_max increased successfully!"
                     else:
@@ -178,7 +178,7 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
                 else:
                     return JsonResponse({"status": 400, "messages": "Invalid action!"})
 
-                # কার্টে পণ্যের সংখ্যা ও মোট মূল্য আপডেট করা
+                # Update the cart item count and total price
                 cart = cart_item.cart
 
                 # Prefetch all related data to optimize queries
@@ -186,8 +186,15 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
 
                 cart_count = cart_items.count()
                 cart_total = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart_items)
-
-                return JsonResponse({'status': 200, 'messages': message, 'cart_count': cart_count, 'cart_total': cart_total})
+                print('cart_item.quantity', cart_item.quantity)
+                return JsonResponse({
+                    'status': 200,
+                    'messages': message, 
+                    'quantity': cart_item.quantity,
+                    'cart_count': cart_count, 
+                    'cart_total': cart_total,
+                    'id': cart_item.id
+                })
 
             except Exception as e:
                 return JsonResponse({"status": 400, "messages": str(e)})

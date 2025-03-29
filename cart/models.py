@@ -44,7 +44,7 @@ class Cart(models.Model):
         ordering = ['id']
         verbose_name_plural = '02. Carts'
 
-    def total_price(self):
+    def total_amount(self):
         """
         Calculate total price including variants if available.
         Apply coupon discount if valid.
@@ -76,7 +76,7 @@ class CartItem(models.Model):
         verbose_name_plural = '03. Cart Items'
 
     @property
-    def total_price(self):
+    def cart_total(self):
         """Calculate total price of the item based on variant or product price."""
         if not self.product:
             return Decimal('0.00')  # If product is None, return 0 price

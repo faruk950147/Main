@@ -13,14 +13,14 @@ class CouponAdmin(ModelAdmin):
 admin.site.register(Coupon, CouponAdmin)
 
 class CartAdmin(ModelAdmin):
-    list_display = ['id', 'user', 'coupon', 'paid', 'created_date', 'update_date']
+    list_display = ['id', 'user', 'coupon', 'paid', 'total_amount', 'created_date', 'update_date']
     search_fields = ['user__username', 'coupon__coupon_code']
     list_filter = ['paid']  
     list_editable = ['paid', 'coupon']
 admin.site.register(Cart, CartAdmin)
 
 class CartItemAdmin(ModelAdmin):
-    list_display = ['id', 'cart', 'product', 'variant', 'quantity', 'created_at', 'updated_at']
+    list_display = ['id', 'cart', 'product', 'variant', 'quantity', 'cart_total', 'created_at', 'updated_at']
     search_fields = ['cart__user__username', 'product__title', 'variant__title']
     list_filter = ['cart__paid']
     list_editable = ['cart', 'product', 'variant', 'quantity']
