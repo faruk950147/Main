@@ -31,52 +31,53 @@ class AddToCart(LoginRequiredMixin, generic.View):
             try:
                 # Request to JSON data
                 data = json.loads(request.body)
-                size_id = data.get("size_id")  # optional
-                color_id = data.get("color_id")  # optional
-                quantity = data.get("quantity")  # ensure quantity is an integer and it is required
-                product_id = data.get("product_id")  # ensure product_id is an integer and it is required
+                size_id = data.get("size_id")
+                color_id = data.get("color_id")
+                quantity = data.get("quantity")
+                product_id = data.get("product_id")
 
-                # ensure quantity is not None and it is greater than 0
+                # Quantity validation
                 if quantity is None or int(quantity) <= 0:
                     return JsonResponse({"status": 400, "messages": "Quantity must be greater than 0!"})
-
-                # convert quantity to an integer
                 quantity = int(quantity)
 
-                # ensure product_id is not None
+                # Product validation
                 if not product_id:
                     return JsonResponse({"status": 400, "messages": "Product ID is required!"})
-
-                # get the product
                 product = get_object_or_404(Product, id=product_id)
 
-                # get the variant
+                # Get variant if applicable (Optimized Query)
+                variant_qs = Variants.objects.filter(
+                    product=product,
+                    size_id=size_id if size_id else None,
+                    color_id=color_id if color_id else None
+                )
+
+                # Safe check for empty queryset
                 variant = None
-                if size_id or color_id:
-                    variant_qs = Variants.objects.filter(product=product)
-                    if size_id:
-                        variant_qs = variant_qs.filter(size_id=size_id)
-                    if color_id:
-                        variant_qs = variant_qs.filter(color_id=color_id)
+                if variant_qs.exists():  # Ensure queryset is not empty
+                    variant = variant_qs[0]  # Get first item safely
 
-                    if variant_qs.exists():
-                        variant = variant_qs[0]  # get the first variant
-                    else:
-                        return JsonResponse({"status": 400, "messages": "Variant not found!"})
+                if (size_id or color_id) and not variant:
+                    return JsonResponse({"status": 400, "messages": "Variant not found!"})
 
-                # ensure the stock is not 0
-                max_stock = variant.quantity if variant else product.in_stock_max
+                # Stock validation
+                max_stock = variant.quantity if variant else (product.in_stock_max or 0)
                 if max_stock <= 0:
                     return JsonResponse({"status": 400, "messages": "Product out of stock!"})
 
-                # get the cart or create a new one
-                cart, _ = Cart.objects.get_or_create(user=request.user, paid=False)
+                # Get or create cart (Optimized Query)
+                cart_qs = Cart.objects.filter(user=request.user, paid=False).prefetch_related('items__product', 'items__variant')
+                if cart_qs.exists():
+                    cart = cart_qs[0]  # Use qs[0] instead of first()
+                else:
+                    cart = Cart.objects.create(user=request.user, paid=False)
 
-                # check if the product already exists in the cart
-                cart_item_qs = CartItem.objects.filter(cart=cart, product=product, variant=variant)
+                # Check if product already exists in cart
+                cart_item_qs = cart.items.filter(product=product, variant=variant)
 
                 if cart_item_qs.exists():
-                    existing_cart_item = cart_item_qs[0]
+                    existing_cart_item = cart_item_qs[0]  # Use qs[0] instead of first()
                     new_quantity = existing_cart_item.quantity + quantity
                     if new_quantity <= max_stock:
                         existing_cart_item.quantity = new_quantity
@@ -91,14 +92,14 @@ class AddToCart(LoginRequiredMixin, generic.View):
                     else:
                         return JsonResponse({"status": 400, "messages": f"You can't add more than {max_stock} units!"})
 
-                # update the cart product count and total price
-                cart_products = CartItem.objects.filter(cart=cart)
-                cart_count = cart_products.count()
-                cart_total = sum(item.quantity * (item.product.price or 0) for item in cart_products)
+                # Update cart count & total price (Optimized)
+                cart_count = cart.items.count()
+                cart_total = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart.items.all())
+
 
                 return JsonResponse({'status': 200, 'messages': messages, 'cart_count': cart_count, 'cart_total': cart_total})
 
-            except (ValueError, TypeError, json.JSONDecodeError, IndexError) as e:
+            except (ValueError, TypeError, json.JSONDecodeError) as e:
                 return JsonResponse({"status": 400, "messages": f"Invalid input: {str(e)}"})
 
         return JsonResponse({'status': 400, 'messages': 'Invalid request'})
