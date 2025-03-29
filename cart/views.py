@@ -94,10 +94,14 @@ class AddToCart(LoginRequiredMixin, generic.View):
 
                 # Update cart count & total price (Optimized)
                 cart_count = cart.items.count()
-                cart_total = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart.items.all())
+                cart_totals = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart.items.all())
 
-
-                return JsonResponse({'status': 200, 'messages': messages, 'cart_count': cart_count, 'cart_total': cart_total})
+                return JsonResponse({
+                    'status': 200, 
+                    'messages': messages, 
+                    'cart_count': cart_count, 
+                    'cart_totals': cart_totals,
+                })
 
             except (ValueError, TypeError, json.JSONDecodeError) as e:
                 return JsonResponse({"status": 400, "messages": f"Invalid input: {str(e)}"})
@@ -125,7 +129,6 @@ class CartView(LoginRequiredMixin, generic.View):
             'cart_count': cart_count,
             'cart_total': cart_total
         })
-
 
 @method_decorator(never_cache, name='dispatch')
 class QuantityIncDec(LoginRequiredMixin, generic.View):
@@ -203,7 +206,6 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
 
         return JsonResponse({"status": 400, "messages": "Invalid request"})
 
-   
 @method_decorator(never_cache, name='dispatch')
 class RemoveToCart(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('sign')
@@ -221,7 +223,19 @@ class RemoveToCart(LoginRequiredMixin, generic.View):
                 cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user, cart__paid=False)
                 if cart_item:
                     cart_item.delete()  
-                    return JsonResponse({"status": 200, "messages": "Item removed from cart"})
+                    cart = cart_item.cart
+                    
+                    cart_items = CartItem.objects.prefetch_related('product', 'variant').filter(cart=cart)
+                    cart_count = cart_items.count()
+                    cart_totals = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart_items)
+                    return JsonResponse({
+                        "status": 200, 
+                        "messages": "Item removed from cart",
+                        "cart_count": cart_count,
+                        "cart_totals": cart_totals,
+                        "payable_price": cart_totals + 150,
+                        "id": cart_item.id
+                    })
                 else:
                     return JsonResponse({"status": 404, "messages": "Cart item not found"})
 

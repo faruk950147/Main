@@ -14,7 +14,7 @@
 							<div class="section-title text-center">
 								<h3 class="title text-center">Carts Review</h3>
 							</div>
-							<table class="shopping-cart-table table ajax-cart-list">
+							<table class="shopping-cart-table table">
 								<thead>
 									<tr>
 										<th>Product</th>
@@ -95,7 +95,7 @@
 									<tr>
 										<th class="empty" colspan="3"></th>
 										<th>SUBTOTAL</th>
-										<th colspan="2" class="sub-total">$ {{cart_totals}}</th>
+										<th colspan="2" class="cart-totals">$ {{cart_totals}}</th>
 									</tr>	
 									<tr>
 										<th class="empty" colspan="3"></th>
@@ -144,20 +144,14 @@
 				success: function (res) {
 					if (res.status == 200) {
 						$("span.quantity[data-id='" + res.id + "']").text(res.quantity);
-						console.log('res', res)
+						$("strong.primary-color[data-id='" + res.id + "']").text("$ " + res.item_total_price);	
+						$(".cart-totals").text("$ " + res.cart_totals);
+						$(".payable-price").text("$ " + res.payable_price);
+						$(".cart-count").text(res.cart_count);
 
 						alertify.success(res.messages)	
 					}
 					else if (res.status == 400) {
-						alertify.error(res.messages);
-					}
-					else if (res.status == 401) {
-						alertify.error(res.messages);
-					}
-					else if (res.status == 402) {
-						alertify.error(res.messages);
-					}
-					else if (res.status == 403) {
 						alertify.error(res.messages);
 					}
 				}
@@ -183,16 +177,12 @@
 				success: function(res){
 					if(res.status == 200){
 						row.fadeOut(300, function(){ $(this).remove(); });
-						$("strong.primary-color[data-id='" + res.id + "']").text("$ " + res.qty_total_price);
+						$("strong.primary-color[data-id='" + res.id + "']").text("$ " + res.item_total_price);
 						$(".cart-total-price").text("$ " + res.cart_total);
-						$(".sub-total").text("$ " + res.sub_total);
-						$(".finale-price").text("$ " + res.finale_price);
+						$(".cart-totals").text("$ " + res.cart_totals);
+						$(".payable-price").text("$ " + res.payable_price);
 						$(".cart-count").text(res.cart_count);
 
-						// Update mini cart
-						//$('.ajax-mini-cart-list').load(location.href + ' .ajax-mini-cart-list');
-						// Update cart list
-						//$('.ajax-cart-list').load(location.href + ' .ajax-cart-list');
 						alertify.success(res.messages);
 
 					}
@@ -222,12 +212,9 @@
 				dataType: "json",
 				success: function(res){
 					if(res.status == 200){
-						$('.cart-total-price').text("$ " + res.total_price_after_discount);
+						$('.cart-totals').text("$ " + res.cart_totals);
+						$('.payable-price').text("$ " + res.payable_price);
 
-						// Update mini cart
-						$('.ajax-mini-cart-list').load(location.href + ' .ajax-mini-cart-list');	
-						// Update cart list
-						$('.ajax-cart-list').load(location.href + ' .ajax-cart-list');
 						alertify.success(res.messages);
 					}
 					else if (res.status == 400) {

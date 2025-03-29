@@ -99,6 +99,9 @@
                   } else if (res.status == 400) {
                       alertify.error(res.messages);
                   }
+              },
+              error: function(res) {
+                alertify.error(res.messages);
               }
           });
       } else {
@@ -137,6 +140,9 @@
             }
           } 
         },
+        error: function(res) {
+          alertify.error(res.messages);
+        }
       });
     }
   });
@@ -166,7 +172,10 @@
               $("#signupBtn").attr('disabled', false);             
             }
           }
-        }       
+        },
+        error: function(res) {
+          alertify.error(res.messages);
+        }
       });
     }
   });
@@ -204,7 +213,10 @@
               $("#signupBtn").attr('disabled', false);             
             }
           }
-        }       
+        },
+        error: function(res) {
+          alertify.error(res.messages);
+        }
       });
     }
   });
