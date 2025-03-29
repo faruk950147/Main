@@ -76,7 +76,7 @@ class CartItem(models.Model):
         ordering = ['id']
         verbose_name_plural = '03. Carts Items'
         
-
+    @property
     def total_price(self):
         """Calculate total price of the item based on variant or product price."""
         if not self.product:

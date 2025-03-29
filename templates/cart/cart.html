@@ -26,50 +26,50 @@
 									</tr>
 								</thead>
 								<tbody>
-									{% for cart_product in cart_products %}
+									{% for cart_item in cart_items %}
 									<tr>
 										<td class="thumb">
-											{% if cart_product.product.products_images.first.image %}
-											<img src="{{cart_product.product.products_images.first.image.url}}" alt="">
+											{% if cart_item.product.products_images.first.image %}
+											<img src="{{cart_item.product.products_images.first.image.url}}" alt="">
 											{% else %}
 											<img src="{% static "img/no-image.jpg" %}" alt="">
 											{% endif %}
 										</td>
 										<td class="details">
-											<a href="#">{{cart_product.product.title}}</a>
+											<a href="#">{{cart_item.product.title}}</a>
 											<ul>
-												<li><span>Size: {% if cart_product.variant.size %}{{cart_product.variant.size}}  {% else %} No Size {% endif %} </span></li>
-												<li><span>Color: {% if cart_product.variant.color %}{{cart_product.variant.color}} {% else %} No Color {% endif %}</span></li>
+												<li><span>Size: {% if cart_item.variant.size %}{{cart_item.variant.size}}  {% else %} No Size {% endif %} </span></li>
+												<li><span>Color: {% if cart_item.variant.color %}{{cart_item.variant.color}} {% else %} No Color {% endif %}</span></li>
 											</ul>
 										</td>
 										<td class="price text-center">
 											<strong>
-												{% if cart_product.product.product_variants.exists %}
-												$ {{cart_product.product.product_variants.first.price}}
+												{% if cart_item.product.product_variants.exists %}
+												$ {{cart_item.product.product_variants.first.price}}
 												{% else %}
-												$ {{cart_product.product.price}}
+												$ {{cart_item.product.price}}
 												{% endif %}
 											</strong>
 											<br>
-											{% if cart_product.product.old_price %}
-											<del class="font-weak"><small>$ {{cart_product.product.old_price}}</small></del>
+											{% if cart_item.product.old_price %}
+											<del class="font-weak"><small>$ {{cart_item.product.old_price}}</small></del>
 											{% endif %}
 										</td>
 										<td class="qty text-center">
-											<button class="btn btn-sm btn-outline-secondary decrease-qty" data-id="{{ cart_product.id }}">-</button>
-											<span class="quantity" data-id="{{ cart_product.id }}"> {{ cart_product.quantity }} </span>
-											<button class="btn btn-sm btn-outline-secondary increase-qty" data-id="{{ cart_product.id }}">+</button>
+											<button class="btn btn-sm btn-outline-secondary decrease-qty" data-id="{{ cart_item.id }}">-</button>
+											<span class="quantity" data-id="{{ cart_item.id }}"> {{ cart_item.quantity }} </span>
+											<button class="btn btn-sm btn-outline-secondary increase-qty" data-id="{{ cart_item.id }}">+</button>
 										</td>
 
 										<td class="total text-center">
-											<strong class="primary-color" data-id="{{ cart_product.id }}">
-												$ {{ cart_product.qty_total_price }}
+											<strong class="primary-color" data-id="{{ cart_item.id }}">
+												$ {{ cart_item.total_price }}
 											</strong>
 										</td>
 										
 										<!-- Remove Item Button -->
 										<td class="text-right">
-											<button class="main-btn icon-btn btn-remove" data-id="{{ cart_product.id }}">
+											<button class="main-btn icon-btn btn-remove" data-id="{{ cart_item.id }}">
 												<i class="fa fa-trash"></i>
 											</button>
 										</td>

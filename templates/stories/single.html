@@ -232,19 +232,23 @@
 						contentType: "application/json",
 						dataType: "json",
 						success: function(res) {
+							console.log(res)
 							if(res.status == 200){
 								alertify.success(res.messages)
 								$('.cart-count').text(res.cart_count)
 								$('.cart-total-price').text(res.cart_total)
 								$('.ajax-mini-cart-list').load(location.href + ' .ajax-mini-cart-list');
+								
 							}
 							else if(res.status == 400){
 								alertify.error(res.messages)
+								console.log(res)
 							}
 						},
 	
 						error: function(res) {
 							alertify.error(res.messages)
+							console.log(res)
 						}
 					});
 				}

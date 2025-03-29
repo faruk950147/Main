@@ -121,25 +121,25 @@
 								</div>
 								<strong class="text-uppercase">My Cart:</strong>
 								<br>
-								<span class="text-uppercase cart-total-price">$ {% if qty_total_price %} {{qty_total_price}} {% else %} 0.00 {% endif %}</span>
+								<span class="text-uppercase cart-total-price">$ {% if cart_total %} {{cart_total}} {% else %} 0.00 {% endif %}</span>
 							</a>
 							<div class="custom-menu">
 								<div id="shopping-cart">
 									<div class="shopping-cart-list ajax-mini-cart-list">
-										{% for cart_product in cart_products %}
+										{% for cart_item in cart_items %}
 											<div class="product product-widget">
 												<div class="product-thumb">
-													{% if cart_product.product.products_images.first.image %}
-													<img src="{{cart_product.product.products_images.first.image.url}}" alt="">
+													{% if cart_item.product.products_images.first.image %}
+													<img src="{{cart_item.product.products_images.first.image.url}}" alt="">
 													{% else %}
 													<img src="{% static "img/no-image.jpg" %}" alt="">
 													{% endif %}
 												</div>
 												<div class="product-body">
-													<h3 class="product-price">$ {{cart_product.qty_total_price}} <span class="qty">x {{cart_product.quantity}}</span></h3>
-													<h2 class="product-name"><a href="#">{{cart_product.product.title}}</a></h2>
+													<h3 class="product-price">$ {{cart_item.total_price}} <span class="qty">x {{cart_item.quantity}}</span></h3>
+													<h2 class="product-name"><a href="#">{{cart_item.product.title}}</a></h2>
 												</div>
-												<button class="cancel-btn btn-remove" data-id="{{ cart_product.id }}">
+												<button class="cancel-btn btn-remove" data-id="{{ cart_item.id }}">
 													<i class="fa fa-trash"></i>
 												</button>
 											</div>
