@@ -185,14 +185,16 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
                 cart_items = CartItem.objects.prefetch_related('product', 'variant').filter(cart=cart)
 
                 cart_count = cart_items.count()
-                cart_total = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart_items)
+                cart_totals = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart_items)
                 print('cart_item.quantity', cart_item.quantity)
                 return JsonResponse({
                     'status': 200,
                     'messages': message, 
                     'quantity': cart_item.quantity,
+                    'item_total_price':  cart_item.quantity * (cart_item.variant.price if cart_item.variant else cart_item.product.price),
                     'cart_count': cart_count, 
-                    'cart_total': cart_total,
+                    'cart_totals': cart_totals,
+                    'payable_price': cart_totals + 150,
                     'id': cart_item.id
                 })
 

@@ -63,7 +63,7 @@
 
 										<td class="total text-center">
 											<strong class="primary-color" data-id="{{ cart_item.id }}">
-												$ {{ cart_item.total_price }}
+												$ {{ cart_item.item_total_price }}
 											</strong>
 										</td>
 										
@@ -95,7 +95,7 @@
 									<tr>
 										<th class="empty" colspan="3"></th>
 										<th>SUBTOTAL</th>
-										<th colspan="2" class="sub-total">$ {{sub_total}}</th>
+										<th colspan="2" class="sub-total">$ {{cart_totals}}</th>
 									</tr>	
 									<tr>
 										<th class="empty" colspan="3"></th>
@@ -105,7 +105,7 @@
 									<tr>
 										<th class="empty" colspan="3"></th>
 										<th>TOTAL</th>
-										<th colspan="2" class="finale-price">$ {{finale_price}}</th>
+										<th colspan="2" class="payable-price">$ {{payable_price}}</th>
 									</tr>
 								</tfoot>
 							</table>

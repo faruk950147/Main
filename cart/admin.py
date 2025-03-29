@@ -20,7 +20,7 @@ class CartAdmin(ModelAdmin):
 admin.site.register(Cart, CartAdmin)
 
 class CartItemAdmin(ModelAdmin):
-    list_display = ['id', 'cart', 'product', 'variant', 'quantity', 'cart_total', 'created_at', 'updated_at']
+    list_display = ['id', 'cart', 'product', 'variant', 'quantity', 'item_total_price', 'created_date', 'update_date']
     search_fields = ['cart__user__username', 'product__title', 'variant__title']
     list_filter = ['cart__paid']
     list_editable = ['cart', 'product', 'variant', 'quantity']

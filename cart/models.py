@@ -44,13 +44,14 @@ class Cart(models.Model):
         ordering = ['id']
         verbose_name_plural = '02. Carts'
 
+    @property
     def total_amount(self):
         """
         Calculate total price including variants if available.
         Apply coupon discount if valid.
         """
         total = sum(
-            item.total_price for item in self.items.all()
+            item.item_total_price for item in self.items.all()
         )
 
         # Apply coupon discount if valid
@@ -68,15 +69,15 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
     variant = models.ForeignKey(Variants, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['id']
         verbose_name_plural = '03. Cart Items'
 
     @property
-    def cart_total(self):
+    def item_total_price(self):
         """Calculate total price of the item based on variant or product price."""
         if not self.product:
             return Decimal('0.00')  # If product is None, return 0 price
