@@ -180,9 +180,12 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
 
                 # কার্টে পণ্যের সংখ্যা ও মোট মূল্য আপডেট করা
                 cart = cart_item.cart
-                cart_products = CartItem.objects.filter(cart=cart)
-                cart_count = cart_products.count()
-                cart_total = sum(item.quantity * (item.product.price or 0) for item in cart_products)
+
+                # Prefetch all related data to optimize queries
+                cart_items = CartItem.objects.prefetch_related('product', 'variant').filter(cart=cart)
+
+                cart_count = cart_items.count()
+                cart_total = sum(item.quantity * (item.variant.price if item.variant else item.product.price) for item in cart_items)
 
                 return JsonResponse({'status': 200, 'messages': message, 'cart_count': cart_count, 'cart_total': cart_total})
 
@@ -191,31 +194,29 @@ class QuantityIncDec(LoginRequiredMixin, generic.View):
 
         return JsonResponse({"status": 400, "messages": "Invalid request"})
 
-
+   
 @method_decorator(never_cache, name='dispatch')
 class RemoveToCart(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('sign')
 
     def post(self, request):
-        try:
-            data = json.loads(request.body)
-            cart_item_id = data.get("id")
-
-            if not cart_item_id:
-                return JsonResponse({"status": 400, "messages": "Missing cart item ID"})
-
-            # Remove the cart item
+        if request.method == "POST":
             try:
-                cart_item = CartItem.objects.get(id=cart_item_id, cart__user=request.user, cart__paid=False)
-                cart_item.delete()
-                return JsonResponse({"status": 200, "messages": "Item removed from cart"})
-            except CartItem.DoesNotExist:
-                return JsonResponse({"status": 404, "messages": "Cart item not found"})
+                data = json.loads(request.body)
+                cart_item_id = data.get("id")
 
-        except json.JSONDecodeError:
-            return JsonResponse({"status": 400, "messages": "Invalid JSON data"})
-        except Exception as e:
-            return JsonResponse({"status": 400, "messages": f"Error: {str(e)}"})
+                if not cart_item_id:
+                    return JsonResponse({"status": 400, "messages": "Missing cart item ID"})
 
- 
+                # Remove the cart item (optimized)
+                cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user, cart__paid=False)
+                if cart_item:
+                    cart_item.delete()  
+                    return JsonResponse({"status": 200, "messages": "Item removed from cart"})
+                else:
+                    return JsonResponse({"status": 404, "messages": "Cart item not found"})
+
+            except (ValueError, TypeError, json.JSONDecodeError) as e:
+                return JsonResponse({"status": 400, "messages": f"Invalid input: {str(e)}"})
         
+        return JsonResponse({"status": 400, "messages": "Invalid request"})
